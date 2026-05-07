@@ -7433,6 +7433,7 @@ function renderOverview() {
    Returns 'met' | 'partial' | 'notmet' | 'unknown'.
    Only uses data ALREADY in the row; does not invent anything.  */
 function classifyVendorOnRow(row, vendorId, sectionId) {
+  if (!row) return 'unknown';  // custom-added rows have no vendor data
   // Matrix rows carry a string code per vendor
   if (sectionId === 'matrix') {
     const code = (row.v && row.v[vendorId]) || 'np';
