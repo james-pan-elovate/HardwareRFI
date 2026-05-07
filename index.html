@@ -1535,6 +1535,207 @@
     flex-wrap: wrap;
   }
 
+  /* ── AI IMPORT BUTTON ── */
+  .pri-action-btn.ai-import-btn {
+    background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.08) 100%);
+    border-color: rgba(99,102,241,0.35);
+    color: #6366f1;
+    font-weight: 600;
+  }
+  .pri-action-btn.ai-import-btn:hover {
+    background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(139,92,246,0.15) 100%);
+    border-color: #6366f1;
+  }
+
+  /* ── AI IMPORT MODAL ── */
+  .ai-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,14,26,0.55);
+    backdrop-filter: blur(2px);
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ai-modal-overlay.hidden { display: none; }
+  .ai-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+    width: min(780px, 94vw);
+    max-height: 88vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .ai-modal-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(99,102,241,0.05) 0%, rgba(139,92,246,0.05) 100%);
+    flex-shrink: 0;
+  }
+  .ai-modal-header h2 {
+    font-size: 14px; font-weight: 700; color: #6366f1;
+    font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.04em;
+    flex: 1;
+  }
+  .ai-modal-header .ai-close-btn {
+    background: transparent; border: none; cursor: pointer;
+    font-size: 18px; color: var(--muted); padding: 2px 6px;
+    border-radius: 4px; transition: background 0.1s;
+  }
+  .ai-modal-header .ai-close-btn:hover { background: var(--surface-3); color: var(--text); }
+  .ai-modal-body { overflow-y: auto; padding: 24px; flex: 1; }
+  .ai-step { display: none; }
+  .ai-step.active { display: block; }
+
+  /* Step 1 — Upload */
+  .ai-upload-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+  }
+  .ai-field label {
+    display: block; font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted-2); margin-bottom: 6px;
+  }
+  .ai-field select, .ai-field input[type="text"] {
+    width: 100%; padding: 8px 10px;
+    border: 1px solid var(--border); border-radius: 5px;
+    background: var(--surface-2); color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 13px;
+  }
+  .ai-field select:focus, .ai-field input[type="text"]:focus {
+    outline: none; border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+  }
+  .ai-drop-zone {
+    border: 2px dashed var(--border); border-radius: 8px;
+    padding: 32px 20px; text-align: center; cursor: pointer;
+    transition: all 0.15s; background: var(--surface-2);
+    grid-column: span 2;
+  }
+  .ai-drop-zone:hover, .ai-drop-zone.drag-over {
+    border-color: #6366f1; background: rgba(99,102,241,0.04);
+  }
+  .ai-drop-zone .ai-drop-icon { font-size: 28px; margin-bottom: 8px; }
+  .ai-drop-zone .ai-drop-label {
+    font-size: 13px; color: var(--text); font-weight: 500; margin-bottom: 4px;
+  }
+  .ai-drop-zone .ai-drop-sub {
+    font-size: 11.5px; color: var(--muted); font-family: 'IBM Plex Mono', monospace;
+  }
+  .ai-drop-zone.has-file { border-style: solid; border-color: #6366f1; background: rgba(99,102,241,0.04); }
+  .ai-drop-zone.has-file .ai-drop-icon { font-size: 22px; }
+  .ai-analyze-btn {
+    width: 100%; padding: 11px;
+    background: #6366f1; color: #fff; border: none; border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.06em; cursor: pointer; transition: background 0.15s;
+    margin-top: 8px;
+  }
+  .ai-analyze-btn:hover { background: #4f46e5; }
+  .ai-analyze-btn:disabled { background: var(--muted-2); cursor: not-allowed; }
+
+  /* Step 2 — Processing */
+  .ai-processing {
+    text-align: center; padding: 48px 20px;
+  }
+  .ai-spinner {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 3px solid rgba(99,102,241,0.2);
+    border-top-color: #6366f1;
+    animation: ai-spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes ai-spin { to { transform: rotate(360deg); } }
+  .ai-processing h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .ai-processing p { font-size: 12.5px; color: var(--muted); }
+
+  /* Step 3 — Review */
+  .ai-review-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+  }
+  .ai-review-header h3 { font-size: 14px; font-weight: 600; color: var(--text); }
+  .ai-review-stats {
+    display: flex; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  }
+  .ai-stat { padding: 3px 9px; border-radius: 10px; font-weight: 600; }
+  .ai-stat.confirmed { background: rgba(22,163,74,0.1); color: #16a34a; }
+  .ai-stat.partial   { background: rgba(217,119,6,0.1);  color: #d97706; }
+  .ai-stat.notmet    { background: rgba(220,38,38,0.1);  color: #dc2626; }
+  .ai-stat.unknown   { background: rgba(100,116,139,0.1); color: #64748b; }
+  .ai-review-table {
+    width: 100%; border-collapse: collapse; font-size: 12.5px;
+    margin-bottom: 16px;
+  }
+  .ai-review-table th {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-2);
+    padding: 6px 10px; border-bottom: 2px solid var(--border);
+    text-align: left; white-space: nowrap;
+  }
+  .ai-review-table td {
+    padding: 6px 10px; border-bottom: 1px solid var(--border-soft);
+    vertical-align: middle;
+  }
+  .ai-review-table tr.excluded td { opacity: 0.38; }
+  .ai-finding-toggle {
+    cursor: pointer; width: 16px; height: 16px;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface); flex-shrink: 0;
+  }
+  .ai-finding-toggle.checked { background: #6366f1; border-color: #6366f1; }
+  .ai-finding-toggle.checked::after { content: '✓'; font-size: 10px; color: #fff; font-weight: 700; }
+  .ai-status-badge {
+    display: inline-block; padding: 2px 7px; border-radius: 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+    white-space: nowrap;
+  }
+  .ai-status-badge.confirmed { background: rgba(22,163,74,0.12);  color: #16a34a; }
+  .ai-status-badge.partial   { background: rgba(217,119,6,0.12);  color: #d97706; }
+  .ai-status-badge.notmet    { background: rgba(220,38,38,0.12);  color: #dc2626; }
+  .ai-status-badge.unknown   { background: rgba(100,116,139,0.1); color: #64748b; }
+  .ai-status-badge.text      { background: rgba(8,145,178,0.1);   color: #0891b2; }
+  .ai-note-text { font-size: 11.5px; color: var(--muted); font-style: italic; }
+  .ai-new-caps {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 14px; margin-bottom: 16px;
+  }
+  .ai-new-caps h4 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase; color: #6366f1;
+    margin-bottom: 8px;
+  }
+  .ai-new-cap-item { font-size: 12.5px; color: var(--text); padding: 3px 0; }
+  .ai-new-cap-item strong { font-weight: 600; }
+  .ai-new-cap-item span   { color: var(--muted); font-size: 11.5px; }
+  .ai-apply-bar {
+    display: flex; align-items: center; gap: 10px; padding-top: 8px;
+    border-top: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .ai-apply-btn {
+    padding: 9px 20px; background: #6366f1; color: #fff;
+    border: none; border-radius: 6px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.05em; transition: background 0.15s;
+  }
+  .ai-apply-btn:hover { background: #4f46e5; }
+  .ai-apply-btn:disabled { background: var(--muted-2); cursor: not-allowed; }
+  .ai-select-toggle {
+    font-size: 12px; color: #6366f1; cursor: pointer; text-decoration: underline;
+    background: none; border: none; padding: 0;
+  }
+  .ai-filter-bar {
+    display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .ai-filter-btn {
+    padding: 3px 10px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface-2); font-size: 11px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; color: var(--muted); transition: all 0.1s;
+  }
+  .ai-filter-btn.active { background: #6366f1; border-color: #6366f1; color: #fff; }
+
   .pri-toggle {
     display: inline-flex;
     border: 1px solid var(--border);
@@ -7595,6 +7796,8 @@ function renderPriorities() {
       <button class="pri-action-btn" id="priExport" title="Download your state as a JSON file (for backup or manual transfer).">Export JSON</button>
       <button class="pri-action-btn" id="priImport" title="Load state from a previously exported JSON file.">Import JSON</button>
       <span style="width:1px;height:22px;background:var(--border);margin:0 4px;"></span>
+      <button class="pri-action-btn ai-import-btn" id="priAiImport" title="Upload a vendor PDF and let AI extract capability data automatically.">✦ AI Import</button>
+      <span style="width:1px;height:22px;background:var(--border);margin:0 4px;"></span>
       <button class="pri-action-btn danger" id="priReset" title="Clear MUST/NICE/ROAD tags only.">Reset Priorities</button>
       <button class="pri-action-btn danger" id="priResetCustom" title="Clear edits/added/hidden and restore default hidden spec rows.">Reset Edits</button>
       <span style="flex:1;"></span>
@@ -9789,6 +9992,410 @@ function showInitErrorBanner(errors) {
 <!-- ═══ EDIT MODAL CONTAINER ═══ -->
 <div id="editModalRoot"></div>
 
+<!-- ═══ AI IMPORT MODAL ═══ -->
+<div class="ai-modal-overlay hidden" id="aiModalOverlay">
+  <div class="ai-modal" role="dialog" aria-modal="true" aria-label="AI Document Import">
+    <div class="ai-modal-header">
+      <h2>✦ AI DOCUMENT IMPORT</h2>
+      <button class="ai-close-btn" id="aiModalClose" title="Close">✕</button>
+    </div>
+    <div class="ai-modal-body">
 
+      <!-- Step 1: Upload -->
+      <div class="ai-step active" id="aiStep1">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.55;">
+          Upload a vendor PDF spec sheet or manual. The AI will read it and extract how each vendor meets your requirements — pre-filling the comparison table so you only review, not re-enter.
+        </p>
+        <div class="ai-upload-grid">
+          <div class="ai-field">
+            <label>Vendor</label>
+            <select id="aiVendorSelect">
+              <option value="">— select vendor —</option>
+              <option value="vitronic" data-name="VITRONIC">VITRONIC</option>
+              <option value="mesa" data-name="MESA TECH">MESA TECH</option>
+              <option value="mobilis" data-name="MOBILIS">MOBILIS</option>
+              <option value="intertraf" data-name="INTERTRAF">INTERTRAF</option>
+              <option value="idemia" data-name="IDEMIA">IDEMIA</option>
+            </select>
+          </div>
+          <div class="ai-field">
+            <label>Document hint (optional)</label>
+            <input type="text" id="aiDocHint" placeholder="e.g. Installation Manual v4" />
+          </div>
+          <div class="ai-drop-zone" id="aiDropZone">
+            <div class="ai-drop-icon">📄</div>
+            <div class="ai-drop-label">Drop a PDF here, or click to browse</div>
+            <div class="ai-drop-sub">PDF only · max 15 MB</div>
+            <input type="file" id="aiFileInput" accept="application/pdf,.pdf" style="display:none;" />
+          </div>
+        </div>
+        <button class="ai-analyze-btn" id="aiAnalyzeBtn" disabled>✦ Analyze Document</button>
+        <p style="font-size:11px;color:var(--muted-2);margin-top:10px;font-family:'IBM Plex Mono',monospace;">
+          Requires ANTHROPIC_API_KEY set in Vercel environment variables.
+        </p>
+      </div>
+
+      <!-- Step 2: Processing -->
+      <div class="ai-step" id="aiStep2">
+        <div class="ai-processing">
+          <div class="ai-spinner"></div>
+          <h3>Analyzing document…</h3>
+          <p id="aiProcessingMsg">Reading <span id="aiProcessingFile"></span> and extracting capabilities against 101 requirements.</p>
+        </div>
+      </div>
+
+      <!-- Step 3: Review -->
+      <div class="ai-step" id="aiStep3">
+        <div class="ai-review-header">
+          <h3 id="aiReviewTitle">Review Findings</h3>
+          <div class="ai-review-stats" id="aiReviewStats"></div>
+        </div>
+        <div id="aiNewCaps"></div>
+        <div class="ai-filter-bar" id="aiFilterBar">
+          <button class="ai-filter-btn active" data-filter="all">All</button>
+          <button class="ai-filter-btn" data-filter="confirmed">Confirmed</button>
+          <button class="ai-filter-btn" data-filter="partial">Partial</button>
+          <button class="ai-filter-btn" data-filter="notmet">Not Met</button>
+          <button class="ai-filter-btn" data-filter="unknown">Unknown</button>
+        </div>
+        <table class="ai-review-table" id="aiReviewTable">
+          <thead>
+            <tr>
+              <th style="width:24px;"></th>
+              <th>Requirement</th>
+              <th>Section</th>
+              <th>AI Finding</th>
+              <th>Note / Evidence</th>
+            </tr>
+          </thead>
+          <tbody id="aiReviewBody"></tbody>
+        </table>
+        <div class="ai-apply-bar">
+          <button class="ai-apply-btn" id="aiApplyBtn">Apply Selected Updates</button>
+          <button class="ai-select-toggle" id="aiSelectAll">Select all</button>
+          <button class="ai-select-toggle" id="aiSelectNone">Deselect unknown</button>
+          <span style="flex:1;"></span>
+          <span style="font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;" id="aiApplyCount"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   AI IMPORT MODAL — runs after initApp()
+   ═══════════════════════════════════════════════════════════ */
+(function initAiImport() {
+
+  const overlay   = document.getElementById('aiModalOverlay');
+  const closeBtn  = document.getElementById('aiModalClose');
+  const step1     = document.getElementById('aiStep1');
+  const step2     = document.getElementById('aiStep2');
+  const step3     = document.getElementById('aiStep3');
+  const dropZone  = document.getElementById('aiDropZone');
+  const fileInput = document.getElementById('aiFileInput');
+  const analyzeBtn= document.getElementById('aiAnalyzeBtn');
+  const vendorSel = document.getElementById('aiVendorSelect');
+
+  let selectedFile = null;
+  let findings     = [];   // full result from API
+  let activeFilter = 'all';
+  let excluded     = new Set(); // keys the user deselected
+
+  const SECTION_LABELS = {
+    capabilities: '01 Capabilities', detection: '02 Detection',
+    image: '03 Image', functionality: '04 Functionality',
+    physical: '05 Physical', security: '06 Security', matrix: '07 Matrix'
+  };
+
+  // ── Open / close ──
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#priAiImport');
+    if (btn) openModal();
+  });
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  function openModal() {
+    resetToStep1();
+    overlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    overlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function showStep(n) {
+    [step1, step2, step3].forEach((s, i) => s.classList.toggle('active', i === n - 1));
+  }
+
+  function resetToStep1() {
+    selectedFile = null;
+    findings = [];
+    excluded.clear();
+    activeFilter = 'all';
+    dropZone.classList.remove('has-file');
+    dropZone.querySelector('.ai-drop-label').textContent = 'Drop a PDF here, or click to browse';
+    dropZone.querySelector('.ai-drop-sub').textContent = 'PDF only · max 15 MB';
+    dropZone.querySelector('.ai-drop-icon').textContent = '📄';
+    fileInput.value = '';
+    analyzeBtn.disabled = true;
+    showStep(1);
+  }
+
+  // ── File drop / pick ──
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault(); dropZone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) setFile(f);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) setFile(fileInput.files[0]);
+  });
+  vendorSel.addEventListener('change', updateAnalyzeBtn);
+
+  function setFile(f) {
+    if (f.type !== 'application/pdf' && !f.name.endsWith('.pdf')) {
+      alert('Please upload a PDF file.'); return;
+    }
+    if (f.size > 15 * 1024 * 1024) {
+      alert('File too large — please keep PDFs under 15 MB.'); return;
+    }
+    selectedFile = f;
+    dropZone.classList.add('has-file');
+    dropZone.querySelector('.ai-drop-icon').textContent = '✅';
+    dropZone.querySelector('.ai-drop-label').textContent = f.name;
+    dropZone.querySelector('.ai-drop-sub').textContent = (f.size / 1024).toFixed(0) + ' KB';
+    updateAnalyzeBtn();
+  }
+
+  function updateAnalyzeBtn() {
+    analyzeBtn.disabled = !(selectedFile && vendorSel.value);
+  }
+
+  // ── Analyze ──
+  analyzeBtn.addEventListener('click', async () => {
+    if (!selectedFile || !vendorSel.value) return;
+
+    const vendorId   = vendorSel.value;
+    const vendorName = vendorSel.options[vendorSel.selectedIndex].dataset.name || vendorId;
+    const hint       = (document.getElementById('aiDocHint').value || '').trim();
+    const fileName   = hint || selectedFile.name;
+
+    document.getElementById('aiProcessingFile').textContent = '"' + fileName + '"';
+    showStep(2);
+
+    try {
+      const base64 = await fileToBase64(selectedFile);
+
+      const res = await fetch('/api/analyze-doc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vendorId, vendorName, fileName,
+          fileType: 'application/pdf',
+          fileBase64: base64
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showStep(1);
+        alert('Analysis failed: ' + (data.error || res.status));
+        return;
+      }
+
+      findings = data.findings || [];
+      renderReview(data, vendorName);
+      showStep(3);
+
+    } catch (err) {
+      showStep(1);
+      alert('Request failed: ' + (err.message || err));
+    }
+  });
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = (e) => resolve(e.target.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ── Render review table ──
+  function renderReview(data, vendorName) {
+    const { findings: f = [], new_capabilities: nc = [], vendorId } = data;
+
+    // Stats
+    const counts = { confirmed: 0, partial: 0, notmet: 0, unknown: 0, text: 0 };
+    f.forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; else counts.unknown++; });
+
+    document.getElementById('aiReviewTitle').textContent =
+      vendorName + ' — ' + f.length + ' findings from "' + (data.fileName || 'document') + '"';
+
+    document.getElementById('aiReviewStats').innerHTML =
+      ['confirmed','partial','notmet','unknown'].map(s =>
+        counts[s] > 0 ? `<span class="ai-stat ${s}">${s === 'unknown' ? '?' : s === 'confirmed' ? '✓' : s === 'partial' ? '~' : '✗'} ${counts[s]}</span>` : ''
+      ).join('');
+
+    // New capabilities callout
+    const newCapsEl = document.getElementById('aiNewCaps');
+    if (nc.length > 0) {
+      newCapsEl.innerHTML = `
+        <div class="ai-new-caps">
+          <h4>✦ ${nc.length} new capability${nc.length === 1 ? '' : 's'} found — not in current requirements</h4>
+          ${nc.map(c => `<div class="ai-new-cap-item"><strong>${escapeHtml(c.name)}</strong> <span>— ${escapeHtml(c.description || '')}</span></div>`).join('')}
+        </div>`;
+    } else {
+      newCapsEl.innerHTML = '';
+    }
+
+    // Pre-deselect unknowns
+    excluded.clear();
+    f.forEach(r => { if (r.status === 'unknown') excluded.add(r.key); });
+
+    renderTable(f);
+    updateApplyCount();
+
+    // Filter bar
+    document.getElementById('aiFilterBar').querySelectorAll('.ai-filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === activeFilter);
+      btn.onclick = () => {
+        activeFilter = btn.dataset.filter;
+        document.getElementById('aiFilterBar').querySelectorAll('.ai-filter-btn')
+          .forEach(b => b.classList.toggle('active', b.dataset.filter === activeFilter));
+        renderTable(findings);
+      };
+    });
+
+    document.getElementById('aiSelectAll').onclick = () => {
+      excluded.clear(); renderTable(findings); updateApplyCount();
+    };
+    document.getElementById('aiSelectNone').onclick = () => {
+      findings.filter(r => r.status === 'unknown').forEach(r => excluded.add(r.key));
+      renderTable(findings); updateApplyCount();
+    };
+    document.getElementById('aiApplyBtn').onclick = applyFindings;
+  }
+
+  function renderTable(f) {
+    const visible = activeFilter === 'all' ? f : f.filter(r => {
+      const s = r.status === 'text' ? 'confirmed' : r.status;
+      return s === activeFilter;
+    });
+
+    const tbody = document.getElementById('aiReviewBody');
+    tbody.innerHTML = visible.map(r => {
+      const checked = !excluded.has(r.key);
+      const statusLabel = r.status === 'confirmed' ? 'Confirmed'
+                        : r.status === 'partial'   ? 'Partial'
+                        : r.status === 'notmet'    ? 'Not Met'
+                        : r.status === 'text'      ? 'Spec Value'
+                        : 'Unknown';
+      return `<tr class="${checked ? '' : 'excluded'}" data-key="${r.key}">
+        <td><div class="ai-finding-toggle ${checked ? 'checked' : ''}" data-toggle="${r.key}"></div></td>
+        <td>${escapeHtml(r.req || r.key)}</td>
+        <td style="font-size:11px;color:var(--muted);white-space:nowrap;font-family:'IBM Plex Mono',monospace;">${SECTION_LABELS[r.section] || r.section || ''}</td>
+        <td><span class="ai-status-badge ${r.status}">${statusLabel}</span></td>
+        <td class="ai-note-text">${escapeHtml(r.note || '')}</td>
+      </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('[data-toggle]').forEach(el => {
+      el.addEventListener('click', () => {
+        const key = el.dataset.toggle;
+        if (excluded.has(key)) excluded.delete(key);
+        else excluded.add(key);
+        renderTable(findings);
+        updateApplyCount();
+      });
+    });
+  }
+
+  function updateApplyCount() {
+    const n = findings.filter(r => r.status !== 'unknown' && !excluded.has(r.key)).length;
+    document.getElementById('aiApplyCount').textContent = n + ' update' + (n === 1 ? '' : 's') + ' selected';
+    document.getElementById('aiApplyBtn').disabled = n === 0;
+  }
+
+  // ── Apply findings to state ──
+  function applyFindings() {
+    if (!findings.length) return;
+    const vendorId = vendorSel.value;
+    const now = new Date().toISOString();
+    let applied = 0;
+
+    findings.forEach(r => {
+      if (excluded.has(r.key) || r.status === 'unknown') return;
+
+      const key = r.key;   // e.g. "detection:r3" or "capabilities:g0:r2"
+      const section = r.section;
+
+      if (section === 'matrix') {
+        // Matrix overrides go through cellOverrides with matrix-specific handling
+        const status = r.status === 'confirmed' ? 'confirmed'
+                     : r.status === 'partial'   ? 'score:4'
+                     : r.status === 'notmet'    ? 'score:2'
+                     : 'placeholder';
+        const overrideKey = key + ':' + vendorId;
+        state.capabilityEdits.cellOverrides[overrideKey] = {
+          status, note: r.note || '', editedAt: now
+        };
+      } else if (section === 'image' || section === 'physical') {
+        // Specs sections — use text status with the note as the value
+        const overrideKey = key + ':' + vendorId;
+        if (r.status === 'text' && r.note) {
+          state.capabilityEdits.cellOverrides[overrideKey] = {
+            status: 'text', note: r.note, editedAt: now
+          };
+        } else if (r.status === 'confirmed') {
+          state.capabilityEdits.cellOverrides[overrideKey] = {
+            status: 'confirmed', note: r.note || '', editedAt: now
+          };
+        } else if (r.status === 'notmet') {
+          state.capabilityEdits.cellOverrides[overrideKey] = {
+            status: 'placeholder', note: r.note || 'Not in documents', editedAt: now
+          };
+        } else {
+          return; // skip partial/unknown for specs
+        }
+      } else {
+        // Comp sections (capabilities, detection, functionality, security)
+        const status = r.status === 'confirmed' ? 'confirmed'
+                     : r.status === 'partial'   ? 'score:4'
+                     : r.status === 'notmet'    ? 'score:2'
+                     : 'placeholder';
+        const overrideKey = key + ':' + vendorId;
+        state.capabilityEdits.cellOverrides[overrideKey] = {
+          status, note: r.note || '', editedAt: now
+        };
+      }
+      applied++;
+    });
+
+    saveCapabilityEdits();
+    closeModal();
+    renderCurrent();
+    setTimeout(() => alert(`Applied ${applied} update${applied === 1 ? '' : 's'} for ${vendorSel.options[vendorSel.selectedIndex].dataset.name || vendorSel.value}.\n\nAll changes are marked with the edit indicator and can be reviewed or reset in Edit Mode on any capability tab.`), 50);
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+})();
+</script>
 
 </body></html>
