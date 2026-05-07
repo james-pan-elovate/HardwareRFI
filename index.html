@@ -1355,7 +1355,7 @@
 
   .pri-row {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 18px 1fr auto;
     gap: 12px;
     align-items: center;
     padding: 8px 14px;
@@ -1364,6 +1364,26 @@
   }
   .pri-row:hover { background: rgba(0,0,0,0.03); }
   .pri-row:last-child { border-bottom: none; }
+  .pri-drag-handle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--border);
+    cursor: grab;
+    user-select: none;
+    line-height: 1;
+    letter-spacing: -1px;
+    transition: color 0.1s;
+    padding: 2px 0;
+    text-align: center;
+  }
+  .pri-row:hover .pri-drag-handle { color: var(--muted-2); }
+  .pri-drag-handle:active { cursor: grabbing; }
+  .pri-row.is-drag-source { opacity: 0.35; }
+  .pri-row.is-drag-over {
+    background: rgba(184,133,28,0.08);
+    border-top: 2px solid var(--accent);
+  }
+  .pri-row.hidden-row { grid-template-columns: 18px 1fr auto; }
   .pri-row-label {
     font-size: 13px;
     color: var(--fg);
@@ -6095,6 +6115,7 @@ state.priorityCustomizations = {
   hidden: {},
   labels: {},
   added: [],
+  rowOrder: {},               // { sectionId: [key1, key2, ...] } — user drag order
   showHiddenForSections: {}   // transient UI state: which sections are showing hidden rows
 };
 
@@ -6406,9 +6427,10 @@ function loadCustomizations() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') {
-        state.priorityCustomizations.hidden = parsed.hidden || {};
-        state.priorityCustomizations.labels = parsed.labels || {};
-        state.priorityCustomizations.added  = Array.isArray(parsed.added) ? parsed.added : [];
+        state.priorityCustomizations.hidden   = parsed.hidden || {};
+        state.priorityCustomizations.labels   = parsed.labels || {};
+        state.priorityCustomizations.added    = Array.isArray(parsed.added) ? parsed.added : [];
+        state.priorityCustomizations.rowOrder = (parsed.rowOrder && typeof parsed.rowOrder === 'object') ? parsed.rowOrder : {};
         hasStoredCustomizations = true;
       }
     }
@@ -6424,9 +6446,10 @@ function loadCustomizations() {
     (baseline.added || []).length > 0
   );
   if (baselineHasContent) {
-    state.priorityCustomizations.hidden = baseline.hidden || {};
-    state.priorityCustomizations.labels = baseline.labels || {};
-    state.priorityCustomizations.added  = Array.isArray(baseline.added) ? baseline.added : [];
+    state.priorityCustomizations.hidden   = baseline.hidden || {};
+    state.priorityCustomizations.labels   = baseline.labels || {};
+    state.priorityCustomizations.added    = Array.isArray(baseline.added) ? baseline.added : [];
+    state.priorityCustomizations.rowOrder = (baseline.rowOrder && typeof baseline.rowOrder === 'object') ? baseline.rowOrder : {};
   } else {
     // Truly first-ever load with no embedded baseline — seed the default-hidden
     // set so Priorities isn't cluttered with pure spec rows.
@@ -6437,9 +6460,10 @@ function loadCustomizations() {
 function saveCustomizations() {
   try {
     const toSave = {
-      hidden: state.priorityCustomizations.hidden,
-      labels: state.priorityCustomizations.labels,
-      added:  state.priorityCustomizations.added
+      hidden:   state.priorityCustomizations.hidden,
+      labels:   state.priorityCustomizations.labels,
+      added:    state.priorityCustomizations.added,
+      rowOrder: state.priorityCustomizations.rowOrder
     };
     localStorage.setItem(PRI_CUSTOM_LS_KEY, JSON.stringify(toSave));
   } catch (e) {}
@@ -6461,9 +6485,10 @@ function applyEmbeddedBaseline() {
     summary.hadBaseline = true;
   }
   if (cust && typeof cust === 'object') {
-    state.priorityCustomizations.hidden = cust.hidden || {};
-    state.priorityCustomizations.labels = cust.labels || {};
-    state.priorityCustomizations.added  = Array.isArray(cust.added) ? cust.added : [];
+    state.priorityCustomizations.hidden   = cust.hidden || {};
+    state.priorityCustomizations.labels   = cust.labels || {};
+    state.priorityCustomizations.added    = Array.isArray(cust.added) ? cust.added : [];
+    state.priorityCustomizations.rowOrder = (cust.rowOrder && typeof cust.rowOrder === 'object') ? cust.rowOrder : {};
     saveCustomizations();
     summary.hidden = Object.keys(state.priorityCustomizations.hidden).length;
     summary.labels = Object.keys(state.priorityCustomizations.labels).length;
@@ -7504,6 +7529,7 @@ function renderPriorityRow(it, variant) {
   if (variant === 'hidden') {
     return `
       <div class="pri-row hidden-row" data-key="${it.key}">
+        <span></span>
         <div class="pri-row-label">
           <span class="pri-row-text${it.isCustom ? ' custom' : ''}">${escapeHtml(it.label)}</span>
           <span class="pri-row-actions" style="opacity:1;">
@@ -7514,9 +7540,10 @@ function renderPriorityRow(it, variant) {
       </div>
     `;
   }
-  // Normal visible row — with edit + delete affordances on hover
+  // Normal visible row — with drag handle, edit + delete affordances on hover
   return `
-    <div class="pri-row" data-key="${it.key}">
+    <div class="pri-row" data-key="${it.key}" draggable="false">
+      <span class="pri-drag-handle" data-action="drag-handle" title="Drag to reorder">⋮⋮</span>
       <div class="pri-row-label">
         <span class="pri-row-text${it.isCustom ? ' custom' : ''}" data-action="edit">${escapeHtml(it.label)}</span>
         <span class="pri-row-actions">
@@ -7600,6 +7627,16 @@ function renderPriorities() {
       const { meta, visible: vItems, hidden: hItems } = bySection[sid];
       const sc = { must: 0, nice: 0, road: 0, none: 0 };
       vItems.forEach(i => { sc[getPriority(i.key)]++; });
+
+      // Apply user drag order within this section
+      const storedOrder = state.priorityCustomizations.rowOrder[meta.sectionId] || [];
+      if (storedOrder.length > 0) {
+        vItems.sort((a, b) => {
+          const ai = storedOrder.indexOf(a.key);
+          const bi = storedOrder.indexOf(b.key);
+          return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+        });
+      }
 
       // Group visible rows by groupName (capabilities has groups; others are flat)
       const groups = {};
@@ -9132,6 +9169,60 @@ function wirePriorityTabEvents() {
     });
   });
 
+  // ── Drag-and-drop row reordering within sections ──
+  let priDragSrcKey = null;
+  let priDragSrcSection = null;
+  document.querySelectorAll('.pri-section').forEach(section => {
+    const sectionId = section.dataset.section;
+    section.querySelectorAll('.pri-row:not(.hidden-row)').forEach(row => {
+      const key = row.dataset.key;
+      const handle = row.querySelector('[data-action="drag-handle"]');
+      if (handle) {
+        handle.addEventListener('mousedown', () => { row.draggable = true; });
+        handle.addEventListener('mouseup',   () => { row.draggable = false; });
+      }
+      row.addEventListener('dragstart', (e) => {
+        if (!row.draggable) { e.preventDefault(); return; }
+        priDragSrcKey = key;
+        priDragSrcSection = sectionId;
+        row.classList.add('is-drag-source');
+        try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', key); } catch(x) {}
+      });
+      row.addEventListener('dragover', (e) => {
+        if (priDragSrcSection !== sectionId) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        section.querySelectorAll('.pri-row:not(.hidden-row)').forEach(r => r.classList.remove('is-drag-over'));
+        row.classList.add('is-drag-over');
+      });
+      row.addEventListener('dragleave', (e) => {
+        if (!row.contains(e.relatedTarget)) row.classList.remove('is-drag-over');
+      });
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        row.classList.remove('is-drag-over');
+        if (!priDragSrcKey || priDragSrcKey === key || priDragSrcSection !== sectionId) return;
+        const allRows = [...section.querySelectorAll('.pri-row:not(.hidden-row)')];
+        const keys = allRows.map(r => r.dataset.key);
+        const srcIdx = keys.indexOf(priDragSrcKey);
+        const dstIdx = keys.indexOf(key);
+        if (srcIdx === -1 || dstIdx === -1) return;
+        keys.splice(srcIdx, 1);
+        keys.splice(dstIdx, 0, priDragSrcKey);
+        state.priorityCustomizations.rowOrder[sectionId] = keys;
+        saveCustomizations();
+        renderCurrent();
+      });
+      row.addEventListener('dragend', () => {
+        row.draggable = false;
+        row.classList.remove('is-drag-source');
+        section.querySelectorAll('.pri-row').forEach(r => r.classList.remove('is-drag-over'));
+        priDragSrcKey = null;
+        priDragSrcSection = null;
+      });
+    });
+  });
+
   // "+ Add Requirement" button → replace with inline input
   document.querySelectorAll('[data-action="start-add"]').forEach(el => {
     el.addEventListener('click', (e) => {
@@ -9151,9 +9242,10 @@ function wirePriorityTabEvents() {
         exportedAt: new Date().toISOString(),
         priorities: state.priorities,
         customizations: {
-          hidden: state.priorityCustomizations.hidden,
-          labels: state.priorityCustomizations.labels,
-          added:  state.priorityCustomizations.added
+          hidden:   state.priorityCustomizations.hidden,
+          labels:   state.priorityCustomizations.labels,
+          added:    state.priorityCustomizations.added,
+          rowOrder: state.priorityCustomizations.rowOrder
         }
       };
       const blob = new Blob([JSON.stringify(bundle, null, 2)],
@@ -9178,9 +9270,10 @@ function wirePriorityTabEvents() {
         const priJson = JSON.stringify(state.priorities)
           .replace(/</g, '\\u003c'); // escape any "<\/script>" inside user labels
         const custJson = JSON.stringify({
-          hidden: state.priorityCustomizations.hidden,
-          labels: state.priorityCustomizations.labels,
-          added:  state.priorityCustomizations.added
+          hidden:   state.priorityCustomizations.hidden,
+          labels:   state.priorityCustomizations.labels,
+          added:    state.priorityCustomizations.added,
+          rowOrder: state.priorityCustomizations.rowOrder
         }).replace(/</g, '\\u003c');
         const capEditsJson = JSON.stringify({
           cellOverrides: state.capabilityEdits.cellOverrides,
@@ -9307,9 +9400,10 @@ function wirePriorityTabEvents() {
           let savedCust = null;
           if (cust) {
             savedCust = JSON.parse(JSON.stringify(state.priorityCustomizations));
-            state.priorityCustomizations.hidden = cust.hidden || {};
-            state.priorityCustomizations.labels = cust.labels || {};
-            state.priorityCustomizations.added  = Array.isArray(cust.added) ? cust.added : [];
+            state.priorityCustomizations.hidden   = cust.hidden || {};
+            state.priorityCustomizations.labels   = cust.labels || {};
+            state.priorityCustomizations.added    = Array.isArray(cust.added) ? cust.added : [];
+            state.priorityCustomizations.rowOrder = (cust.rowOrder && typeof cust.rowOrder === 'object') ? cust.rowOrder : {};
           }
 
           const validKeys = new Set(enumerateTaggableRows().map(r => r.key));
@@ -9375,9 +9469,10 @@ function wirePriorityTabEvents() {
         // Clear priorities on added rows being removed (they'd be orphaned)
         state.priorityCustomizations.added.forEach(a => { delete state.priorities[a.key]; });
         savePriorities();
-        state.priorityCustomizations.hidden = {};
-        state.priorityCustomizations.labels = {};
-        state.priorityCustomizations.added = [];
+        state.priorityCustomizations.hidden   = {};
+        state.priorityCustomizations.labels   = {};
+        state.priorityCustomizations.added    = [];
+        state.priorityCustomizations.rowOrder = {};
         DEFAULT_HIDDEN_KEYS.forEach(k => { state.priorityCustomizations.hidden[k] = true; });
         saveCustomizations();
         renderCurrent();
