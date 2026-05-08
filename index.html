@@ -5051,7 +5051,7 @@ const VENDOR_SOURCES = {
   vitronic:  'Vitronic spec sheets: FM1 Technical Data Sheet (May 2021) · Red Light VA Preliminary Spec Sheet (Jul 2023) · SSP-X1 Tech Data Sheet (Nov 2020) · PoliScan Speed Enforcement Brochure (2018). Note: FM1 Operation Manual & PoliScan Connect User Manual could not be extracted (proprietary format).',
   mesa:      'Mesa Technology documents: DriveSafe Gen 3.3 product sheet · MAC Phoenix OS Manual v1.3 (Feb 2025) · MAC System Installation & Operation Manual v2.6 (May 2025) · MAC Lite Brochure.',
   mobilis:   'ElovateMobilis_Technology_Requirements_v2_22_Oct_25.xlsx — Mobilis RFP Response, Oct 2025.',
-  intertraf: '3_Elovate_Technology_Requirements_Intertraff.xlsx — Intertraf D-Cop RFP Response, Oct 2025. Supplemented by Jon Garcia (Intertraf) Q&A email, Apr 2026 (covers API, SFTP, event packages, ALPR, storage, lens specs, flash strategy).',
+  intertraf: '3_Elovate_Technology_Requirements_Intertraff.xlsx — Intertraf D-Cop RFP Response, Oct 2025. Supplemented by Jon Garcia (Intertraf) Q&A email, Apr 2026 (covers API, SFTP, event packages, ALPR, storage, lens specs, flash strategy). D-Cop 3 User Manual v.0226 (provided to Elovate) — official hardware/software spec sheet including Appendix F: D-Cop3 SPECIFICATIONS v.1225.',
   idemia:    'MESTAcompact focus edition manager Operating Guide (Dec 2025) & External Camera Installation PDF — image-based PDFs, partially extracted. No RFP response received; evaluation data is incomplete.'
 };
 
@@ -5268,7 +5268,7 @@ const SEC_DETECTION = {
       vitronic:  { html: ph('Not mentioned in provided Vitronic docs; LIDAR is primary sensor'), placeholder:true },
       mesa:      { html: fd('✅', 'Smartmicro TRUGRD Type 48; up to 6 lanes; 256 simultaneous targets; 0–198 MPH; also 3DHD/4DHD options'), confirmed:true },
       mobilis:   { html: sc(6, 'Y/E'), score:6 },
-      intertraf: { html: sc(6, 'Y/E', 'Smartmicro UMRR-11 Type 44; 4D/HD radar; detection range ~100m; tracks up to 256 simultaneous targets across up to 6 lanes. Auto-generates Dcop_STATS CSV per detected vehicle (date/time, lane, direction, speed, classification, length) — retrievable via FTP or TCP/IP. Supports traffic analytics (counts, 85th-percentile speeds, classification ratios) independent of violation events.'), score:6 },
+      intertraf: { html: sc(6, 'Y/E', 'Smartmicro UMRR-11 Type 44; 24.0–24.25 GHz; max range 105m (min 2m); max speed 320 km/h; speed accuracy typ. &lt;±0.28 m/s or ±1% (whichever is greater); update time ≤50ms; tracks up to 64 simultaneous objects; covers up to 6 lanes. Auto-generates Dcop_STATS CSV per detected vehicle (date/time, lane, direction, speed, classification, length) — retrievable via FTP or TCP/IP. Supports traffic analytics (counts, 85th-percentile speeds, classification ratios) independent of violation events.'), score:6 },
       idemia:    { html: ph(), placeholder:true }
     },
     {
@@ -5324,7 +5324,7 @@ const SEC_DETECTION = {
       vitronic:  { html: ph('Spec sheets do not provide explicit accuracy figure; LIDAR claims high precision in brochure text'), placeholder:true },
       mesa:      { html: ph('Radar model: Smartmicro TRUGRD Type 48 — accuracy specs from Smartmicro datasheet, not in provided Mesa docs'), placeholder:true },
       mobilis:   { html: sc(6, 'Y/E', '<code>0.01</code> — unit unspecified ⚠'), score:6 },
-      intertraf: { html: sc(6, 'Y/E', '<code>±0.59 mph</code> over 12–155 mph (official test report)'), score:6 },
+      intertraf: { html: sc(6, 'Y/E', 'Spec sheet: typ. &lt;±0.28 m/s or ±1% (whichever is greater). Official test report: ±0.59 mph over 12–155 mph.'), score:6 },
       idemia:    { html: ph(), placeholder:true }
     },
     {
@@ -5369,7 +5369,7 @@ const SEC_IMAGE = {
       vitronic:  { text: 'CMOS (FM1); Global shutter CMOS (SSP-X1)' },
       mesa:      { text: 'CMOS (DriveSafe spec sheet)' },
       mobilis:   { text: '1.6–16 Mpixels Global Shutter; specific sensor model not named' },
-      intertraf: { text: 'Still: Sony IMX304 (1.1"), 12MP global shutter CMOS (4096×3000) — confirmed by Jon Garcia Apr 2026; Video: IMX678 4K/8MP rolling shutter' },
+      intertraf: { text: 'Still: 1" CMOS global shutter (4096×3000 px, 12.3MP; pixel size 3.45µm×3.45µm; C-mount; USB 3.0 interface; MTBF &gt;150,000 hrs) — Sony IMX304 confirmed by Jon Garcia Apr 2026. Video (ancillary): 4K/8MP rolling shutter CMOS (IMX678).' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5385,7 +5385,7 @@ const SEC_IMAGE = {
       vitronic:  { text: 'Red Light VA: 20fps tracking (60fps optional)' },
       mesa:      { text: '<strong>30fps per camera</strong>; MP4 format; 4K resolution' },
       mobilis:   { text: 'MPEG; 30fps' },
-      intertraf: { text: 'H.264/H.265/H.265+/MJPEG; up to 30fps; 4K (3840×2160)' },
+      intertraf: { text: 'H.264/H.265/H.265+/MJPEG; up to 30fps; max res 3840×2160 (4K/8MP); rolling shutter; 8mm fixed lens; min illumination 0.008 Lux color @ F1.2; WDR 120dB; shutter 1s–1/100,000s. Still camera max: 23FPS global shutter.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5393,7 +5393,7 @@ const SEC_IMAGE = {
       vitronic:  { text: 'FM1: 25mm, 50mm fixed; Red Light VA: 8, 16, 25mm; SSP-X1: 6,8,12,16,20,25,35mm C-Mount' },
       mesa:      { text: '<strong>Motorized zoom</strong>: 4-10mm, 9-36mm, 12-50mm. Auto focus, P-Iris (software controlled). Optical class 1/1.7"' },
       mobilis:   { text: 'Zoom: 5–50mm; Fixed: 25mm, 35mm' },
-      intertraf: { text: '1", C-mount fixed focal length, manual iris. 25mm (red light — 30–35m recommended capture distance); 50mm (speed — 35–40m recommended capture distance). No zoom lens; digital zoom only. Lenses field-replaceable on-site.' },
+      intertraf: { text: 'Still camera: 1.1" C-mount, MegaPixel fixed focal, manual iris. 25mm (red light + speed combined — ~30m capture distance); 50mm (speed-only — 45–50m capture distance). No motorized/optical zoom; digital zoom only via ancillary video camera. Ancillary video camera: 8mm fixed M16 lens (focused at factory). Lenses field-replaceable on-site.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5425,7 +5425,7 @@ const SEC_IMAGE = {
       vitronic:  { text: 'Red Light VA: Intel® Atom®, Windows. SSP-X1: 6-core CPU, Linux.' },
       mesa:      { text: '<strong>Nvidia Jetson TX2</strong> (Denver 2 CPU + 256-core NVIDIA Pascal GPU). Web-based GUI (Chrome/Firefox/Edge/Safari)' },
       mobilis:   { text: 'Linux-based proprietary system; web GUI' },
-      intertraf: { text: 'Windows OS; D-Cop Manager desktop app — <strong>no web interface</strong>' },
+      intertraf: { text: 'Windows 10 x64. Intel Atom x7/E3950 (1.6–2.0GHz); 8GB DDR3 1866 SODIMM. GPU: up to 26 TOPS AI (PCIe Gen 3.0, ~2.4W, CE/FCC). 500GB mSATA SSD. Wi-Fi: IEEE802.11b/g/n. D-Cop Manager desktop app — <strong>no web interface</strong>.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5569,7 +5569,7 @@ const SEC_PHYSICAL = {
       vitronic:  { text: 'FM1: 230×263×309mm; Red Light VA: 395×394×303mm; SSP-X1: 258×304×208mm' },
       mesa:      { text: '<strong>26"×8"×10"</strong> (~66×20×25cm). MAC Lite: 12"H×10.5"W×9"D (~30×27×23cm)' },
       mobilis:   { text: '0.4×0.4×0.7m' },
-      intertraf: { text: 'Fixed: 48×35×25cm. Mobile: 19×27×13cm. D-Cop 3/6: 27×16.5×8cm' },
+      intertraf: { text: 'D-Cop 3 housing: <strong>16.6×26×8cm</strong>. Illuminator: 16.6×18.7×8cm. Pole mount bracket: 250×8cm. Power supply: 120×50×30mm. Mobile D-Cop: 19×27×13cm.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5577,7 +5577,7 @@ const SEC_PHYSICAL = {
       vitronic:  { text: 'FM1: 9.6kg; Red Light VA: 8kg (sensor box); SSP-X1: 7kg' },
       mesa:      { text: '<strong>30 lbs (~13.6kg)</strong>. MAC Lite: 14 lbs (~6.4kg)' },
       mobilis:   { text: '35 kg' },
-      intertraf: { text: 'Fixed: 25kg. Mobile: 3.5kg. D-Cop 3/6: 2kg.' },
+      intertraf: { text: 'D-Cop 3 housing: <strong>2.5 kg</strong>. Illuminator: 1.5 kg. Pole mount bracket: 2 kg. Illuminator bracket: 1 kg. Power supply: 0.5 kg. Mobile D-Cop: ~3.5 kg.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5593,7 +5593,7 @@ const SEC_PHYSICAL = {
       vitronic:  { text: 'FM1: <strong>-40°C to +60°C</strong>; Red Light VA: -25°C to +60°C; SSP-X1: -30°C to +65°C' },
       mesa:      { text: '<strong>-34°C to +70°C</strong> (-20°F to 160°F per MAC Lite; -29°F per DriveSafe)' },
       mobilis:   { text: 'Not specified in RFP response ⚠' },
-      intertraf: { text: '-25°C to +60°C operating; tested -40°C / +70°C for 16 hrs' },
+      intertraf: { text: 'Camera housing: <strong>-25°C to +60°C</strong> operating. Processing module: -40°C to +85°C rated. Illuminator: -25°C to +60°C.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5601,7 +5601,7 @@ const SEC_PHYSICAL = {
       vitronic:  { text: 'FM1: IP65. Red Light VA: IP65. SSP-X1: <strong>IP67</strong>' },
       mesa:      { text: 'IEC 60529 referenced; DriveSafe Gen 3.3: <strong>NEMA 4</strong>; specific IP number not stated in provided docs' },
       mobilis:   { text: 'Not addressed in RFP response ⚠' },
-      intertraf: { text: 'D-Cop 3/6/DDS: IP66. Mobile: IP65 (IP66 upgrade in progress). Fixed: not yet submitted.' },
+      intertraf: { text: 'D-Cop 3 camera housing: <strong>IP65</strong>. LED illuminator housing: IP65. Power supply: <strong>IP66</strong> (EN60529). Mobile D-Cop housing: IP65. ⚠ RFP response had stated IP66 for camera — official spec sheet confirms IP65.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5617,7 +5617,7 @@ const SEC_PHYSICAL = {
       vitronic:  { text: 'FM1: 12VDC / 60W / 5A. Red Light VA: 120VAC / 180W / 1.5A. SSP-X1: 24VDC / <30W / 1.5A' },
       mesa:      { text: '<strong>100–240VAC, 50-60Hz, 1.6A</strong>. MAC Lite: 90-120VAC. DriveSafe Gen 3.3: 24VDC over POE' },
       mobilis:   { text: 'AC (100–260V) or DC (12–24V); 60W nominal / 100W peak. Built-in LiFePO4 battery' },
-      intertraf: { text: '12VDC native; ~30W nominal / ~60W peak. Solar: 450W panels + 2×100Ah batteries' },
+      intertraf: { text: 'Mains input: 110/240V AC 50Hz, 5A. Output: nominal <strong>12.6V DC</strong>. Power supply housing: <strong>IP66</strong> (EN60529); dims 120×50×30mm, 0.5 kg. Nominal consumption ~60W; max 80W (with illuminator). Solar option: 450W panels + 2×100Ah batteries.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5633,7 +5633,7 @@ const SEC_PHYSICAL = {
       vitronic:  { text: 'IEC/EN 60950-1 (CB Safety); EN 55024, EN 55032 (EMC); IEC/EN 62471 (Photobio Safety); IEC/EN 60825-1 (Eye Safety). IP65/67, IK08/10.' },
       mesa:      { text: 'IEC 60529 (dust/water); NEMA 4 (DriveSafe Gen 3.3). UL/CE/CSA not explicitly documented in provided manuals.' },
       mobilis:   { text: 'Brazil, Ecuador, Switzerland, Qatar homologation. UL/CE/IP not addressed in RFP ⚠' },
-      intertraf: { text: 'CE ✓; IP66 ✓; METAS (OIML R91); IEC 60068 climatic tests. UL/CSA = M/D. NMi Netherlands in progress.' },
+      intertraf: { text: 'CE ✓; <strong>IP65</strong> (camera &amp; illuminator housing); <strong>IP66</strong> (power supply, EN60529); METAS (OIML R91); IEC 60068 climatic tests. UL/CSA = M/D. NMi Netherlands in progress. ⚠ RFP response had stated IP66 for camera — official spec sheet confirms IP65.' },
       idemia:    { text: 'Not in documents', nd:true }
     },
     {
@@ -5649,7 +5649,7 @@ const SEC_PHYSICAL = {
       vitronic:  { text: 'LED white flash (VITRONIC LF2) — Red Light VA. IR LED 850nm or 940nm (SSP-X1). Passively cooled.' },
       mesa:      { text: 'Xenon white flash, LED white flash, or 850nm IR — selectable. Flash delay, duration configurable in ms. Flash assigned per shot (A or B).' },
       mobilis:   { text: 'LED white light (Y/E); Xenon (Y/D); IR 850nm (Y/E)' },
-      intertraf: { text: 'LED white or Xenon (D-Cop Fixed/Mobile). LED only (D-Cop 3/6). IR 850nm. Dual illuminator support. Per Jon Garcia: Xenon preferred for nighttime enforcement — produces clear color images showing vehicle make/model/color (as seen in Baltimore testing). IR 850nm enables continuous 24/7 LPR but cannot fully render vehicle color at night. Flash strategy must align with LPR approach.' },
+      intertraf: { text: 'D-Cop 3: <strong>LED white flash</strong> + IR 850nm (no Xenon on D-Cop 3/6). Dual illuminator support. Illuminator: 1.5 kg, IP65, 16.6×18.7×8cm. Flash: 10J/shot, 170J stored energy; min interval <strong>0.02s</strong>; lifespan <strong>500,000 shots</strong>. Operates -25°C to +60°C. Per Jon Garcia: Xenon preferred for nighttime enforcement (clear color images of make/model/color — as seen in Baltimore testing); IR 850nm enables 24/7 LPR but cannot fully render vehicle color at night. Flash strategy must align with LPR approach.' },
       idemia:    { text: 'Not in documents', nd:true }
     }
   ]
@@ -5833,7 +5833,7 @@ const SEC_FLAGS = {
       action:'Obtain Idemia\'s completed RFP response questionnaire, enforcement capability matrix, performance data, and commercial terms before this vendor can be meaningfully scored.' },
     { sev:'MED', vendor:'vitronic', vendorLabel:'VITRONIC',
       issue:'Red Light VA power draw is high (180W)',
-      detail:'PoliScan Red Light VA: 120VAC, 1.5A, 180W — significantly higher than all other vendors\' typical draw. Mesa Gen 3: ~160W max (1.6A @ 100V). Intertraf: 30W nominal. Mobilis: 60W nominal. Vitronic\'s higher draw has solar/battery deployment implications.',
+      detail:'PoliScan Red Light VA: 120VAC, 1.5A, 180W — significantly higher than all other vendors\' typical draw. Mesa Gen 3: ~160W max (1.6A @ 100V). Intertraf: ~60W nominal / ~80W max (with illuminator). Mobilis: 60W nominal. Vitronic\'s higher draw has solar/battery deployment implications.',
       action:'Confirm if solar or battery deployment is required for any Vitronic red light locations. If so, assess feasibility given 180W draw vs available solar panel and battery capacity.' },
     { sev:'MED', vendor:'intertraf', vendorLabel:'INTERTRAF',
       issue:'Enforcement scheduler limited to daily start/stop; day-specific = M/D',
@@ -5892,7 +5892,7 @@ const SEC_SOURCES = {
   content: [
     { vendor:'vitronic', label:'Vitronic source documents', html: `148091_Poliscan_FM12MXD12CGDBA25DUS_DBA50DUSNQM5L2.pdf (FM1 Technical Data Sheet, Rev 1.0 May 2021); 2023Jul21_Vitronic_Red_Light_VA_Prelim_Spec_Sheet_Ver1.pdf (Red Light VA Preliminary Spec Sheet, Jul 2023); 155457_SSPX1_EN_ALPR_Camera.pdf (SSP-X1 Technical Data Sheet, Rev 1.3 Nov 2020); 502002518_Broschuere_Speed_Enforcement_RZ.pdf (PoliScan Speed Enforcement Brochure, 2018). <strong>FM1_Operation_Manual and PoliScan_Connect_User_Manual could not be read</strong> (proprietary format).` },
     { vendor:'mesa', label:'Mesa Technology source documents', html: `DriveSafe_Gen_3_3_Camera.pdf (Elovate DriveSafe Gen 3.3 product sheet); 25_02_13_Mesa_Gen3_Phoenix_Manual.pdf (MAC Phoenix OS Manual, Rev 1.3, Feb 2025); Mesa_Tech__MAC_System_Installation_and_Operation_Manual_7_10_2025.pdf (MAC SOP Manual, Rev 2.6, May 2025); Mesa_MAC_lite_Brochure.pdf (MAC Lite brochure). Mesa_Tech_MAC_Camera_SDM_Manual and MFM_Manual referenced in Phoenix manual but data from them not separately extracted.` },
-    { vendor:'eval', label:'Evaluation candidates', html: `ElovateMobilis_Technology_Requirements_v2_22_Oct_25.xlsx (Mobilis RFP Response, Oct 2025); 3_Elovate_Technology_Requirements_Intertraff.xlsx (Intertraf D-Cop RFP Response, Oct 2025); 2025_200009108701__MESTAcompact_focus_edition_manager_Operating_Guide.pdf and 2025_2000090974_MESTAcompact_focus_edition_External_camera_installation_and_setting_procedure.pdf (IDEMIA MESTAcompact, Dec 2025 — image-based, partial extraction). <strong>Intertraff supplemental: Jon Garcia (Intertraff) Q&amp;A email response, Apr 2026</strong> — covers deployment logs, traffic data (Dcop_STATS), event package format (XML+JPEG+MP4), FTP/SFTP transfer, ALPR engine detail, camera health dashboard, support model, storage auto-purge, work zone deployment, mounting distances, lens spec, flash strategy, shutter type confirmation.` },
+    { vendor:'eval', label:'Evaluation candidates', html: `ElovateMobilis_Technology_Requirements_v2_22_Oct_25.xlsx (Mobilis RFP Response, Oct 2025); 3_Elovate_Technology_Requirements_Intertraff.xlsx (Intertraf D-Cop RFP Response, Oct 2025); 2025_200009108701__MESTAcompact_focus_edition_manager_Operating_Guide.pdf and 2025_2000090974_MESTAcompact_focus_edition_External_camera_installation_and_setting_procedure.pdf (IDEMIA MESTAcompact, Dec 2025 — image-based, partial extraction). <strong>Intertraff supplemental: Jon Garcia (Intertraff) Q&amp;A email response, Apr 2026</strong> — covers deployment logs, traffic data (Dcop_STATS), event package format (XML+JPEG+MP4), FTP/SFTP transfer, ALPR engine detail, camera health dashboard, support model, storage auto-purge, work zone deployment, mounting distances, lens spec, flash strategy, shutter type confirmation. <strong>D-Cop 3 User Manual v.0226 (provided to Elovate)</strong> — official hardware/software specification document including Appendix F: D-Cop3 SPECIFICATIONS v.1225; authoritative source for dimensions, weight, IP rating, sensor, processing hardware, illuminator, power supply, radar model, and operating parameters. Supersedes RFP response where discrepancies exist (notably: camera housing IP65 not IP66; weight 2.5kg not 2kg; dimensions 16.6×26×8cm; radar tracks 64 objects not 256).` },
     { vendor:'confidentiality', label:'Confidentiality', html: `All vendor specifications, pricing, and capability data are strictly confidential. Internal Elovate use only. Do not distribute.` }
   ]
 };
