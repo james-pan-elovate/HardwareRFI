@@ -4,7 +4,7 @@ export default function middleware(request) {
   if (basicAuth) {
     const authValue = basicAuth.split(' ')[1];
     const [, pwd] = atob(authValue).split(':');
-    if (pwd === process.env.AUTH_PASSWORD) {
+    if (pwd === 'Elovate2026!') {
       return;
     }
   }
