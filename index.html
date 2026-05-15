@@ -5929,6 +5929,14 @@ const state = {
 
 /* ── UI STATE: persistence (view, vendors, filters) ── */
 const UI_LS_KEY = 'elovate-ui-state-v1';
+const STRATEGY_DECK_URL_KEY = 'elovate-strategy-deck-url-v1';
+const STRATEGY_DECK_DEFAULT_URL = 'https://ourvolaris.sharepoint.com/:p:/s/ProductManagement/IQD0b9dUGJWGRJwrbcn322_bAbO0k324CMPGt9KKgfB1KpI?e=uCmNJO';
+function getStrategyDeckUrl() {
+  return localStorage.getItem(STRATEGY_DECK_URL_KEY) || STRATEGY_DECK_DEFAULT_URL;
+}
+function setStrategyDeckUrl(url) {
+  localStorage.setItem(STRATEGY_DECK_URL_KEY, url);
+}
 
 function saveUIState() {
   try {
@@ -7519,6 +7527,17 @@ function computeVendorStats(vid) {
   return { confirmed, notInDocs, scored, scoreSum, avgScore: scored ? (scoreSum/scored).toFixed(2) : '—', highScores, devNeeded, total };
 }
 
+function editStrategyDeckUrl() {
+  const current = getStrategyDeckUrl();
+  const newUrl = prompt('Enter the Strategy Deck URL:', current);
+  if (newUrl === null) return; // cancelled
+  const trimmed = newUrl.trim();
+  if (!trimmed) return;
+  setStrategyDeckUrl(trimmed);
+  const link = document.getElementById('strategy-deck-link');
+  if (link) link.href = trimmed;
+}
+
 function renderOverview() {
   // Aggregate stats
   const totalSections = ALL_SECTIONS.length;
@@ -7590,10 +7609,13 @@ function renderOverview() {
         <div style="font-size:14px;color:var(--fg1);margin-bottom:2px;font-weight:500;">Elovate Hardware Strategy</div>
         <div style="font-size:12px;color:var(--fg3);">Context deck covering Elovate's hardware strategy, vendor evaluation rationale, and decision criteria.</div>
       </div>
-      <a href="https://ourvolaris.sharepoint.com/:p:/s/ProductManagement/IQBtYXh3rruNS7lfo1ycASGMAQUBu_pC01XuE7dbC6r4MjI?e=KjWaWa" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--accent);color:#fff;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;">
-        Open Strategy Deck
-        <span style="font-size:11px;">↗</span>
-      </a>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <a id="strategy-deck-link" href="${getStrategyDeckUrl()}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--accent);color:#fff;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;">
+          Open Strategy Deck
+          <span style="font-size:11px;">↗</span>
+        </a>
+        <button onclick="editStrategyDeckUrl()" title="Edit deck URL" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);color:var(--fg2);cursor:pointer;font-size:14px;padding:0;">✏️</button>
+      </div>
     </div>
 
     <div class="type-banner-row">
